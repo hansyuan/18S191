@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.11.8
+# v0.19.4
 
 using Markdown
 using InteractiveUtils
@@ -7,11 +7,37 @@ using InteractiveUtils
 # This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
 macro bind(def, element)
     quote
+        local iv = try Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value catch; b -> missing; end
         local el = $(esc(element))
-        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : missing
+        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : iv(el)
         el
     end
 end
+
+# ╔═╡ 851c03a4-e7a4-11ea-1652-d59b7a6599f0
+# setting up an empty package environment
+begin
+	import Pkg
+	Pkg.activate(mktempdir())
+	Pkg.Registry.update()
+end
+
+# ╔═╡ d6ee91ea-e750-11ea-1260-31ebf3ec6a9b
+# add (ie install) a package to our environment
+begin
+	Pkg.add("Compose")
+	# call `using` so that we can use it in our code
+	using Compose
+end
+
+# ╔═╡ 5acd58e0-e856-11ea-2d3d-8329889fe16f
+begin
+	Pkg.add("PlutoUI")
+	using PlutoUI
+end
+
+# ╔═╡ d472d34a-f3a2-46df-9615-5d86c3059a28
+using Statistics
 
 # ╔═╡ fafae38e-e852-11ea-1208-732b4744e4c2
 md"_homework 0, version 2_"
@@ -19,7 +45,7 @@ md"_homework 0, version 2_"
 # ╔═╡ 7308bc54-e6cd-11ea-0eab-83f7535edf25
 # edit the code below to set your name and kerberos ID (i.e. email without @mit.edu)
 
-student = (name = "Jazzy Doe", kerberos_id = "jazz")
+student = (name = "Vespiere", kerberos_id = "999")
 
 # press the ▶ button in the bottom right of this cell to run your edits
 # or use Shift+Enter
@@ -99,7 +125,10 @@ Write a function newton_sqrt(x) which implements the above algorithm."
 
 # ╔═╡ 4896bf0c-e754-11ea-19dc-1380bb356ab6
 function newton_sqrt(x, error_margin=0.01, a=x / 2) # a=x/2 is the default value of `a`
-	return x # this is wrong, write your code here!
+	while abs(x/a - a) >= error_margin
+		a = mean([a, x/a])
+	end
+	return a # this is wrong, write your code here!
 end
 
 # ╔═╡ 7a01a508-e78a-11ea-11da-999d38785348
@@ -156,28 +185,6 @@ md"To draw Sierpinski's triangle, we are going to use an external package, [_Com
 A package contains a coherent set of functionality that you can often use a black box according to its specification. There are [lots of Julia packages](https://juliahub.com/ui/Home).
 "
 
-# ╔═╡ 851c03a4-e7a4-11ea-1652-d59b7a6599f0
-# setting up an empty package environment
-begin
-	import Pkg
-	Pkg.activate(mktempdir())
-	Pkg.Registry.update()
-end
-
-# ╔═╡ d6ee91ea-e750-11ea-1260-31ebf3ec6a9b
-# add (ie install) a package to our environment
-begin
-	Pkg.add("Compose")
-	# call `using` so that we can use it in our code
-	using Compose
-end
-
-# ╔═╡ 5acd58e0-e856-11ea-2d3d-8329889fe16f
-begin
-	Pkg.add("PlutoUI")
-	using PlutoUI
-end
-
 # ╔═╡ dbc4da6a-e7b4-11ea-3b70-6f2abfcab992
 md"Just like the definition above, our `sierpinksi` function is _recursive_: it calls itself."
 
@@ -216,7 +223,11 @@ area_sierpinski(1) = 0.??
 
 # ╔═╡ ca8d2f72-e7b6-11ea-1893-f1e6d0a20dc7
 function area_sierpinski(n)
-	return 1.0
+	if n == 0
+		return 1
+	else
+		return 3/4*area_sierpinski(n-1)
+	end
 end
 
 # ╔═╡ 71c78614-e7bc-11ea-0959-c7a91a10d481
@@ -318,6 +329,7 @@ has area **$(area_sierpinski(n))**
 # ╠═bccf0e88-e754-11ea-3ab8-0170c2d44628
 # ╟─e7abd366-e7a6-11ea-30d7-1b6194614d0a
 # ╟─d62f223c-e754-11ea-2470-e72a605a9d7e
+# ╠═d472d34a-f3a2-46df-9615-5d86c3059a28
 # ╠═4896bf0c-e754-11ea-19dc-1380bb356ab6
 # ╠═7a01a508-e78a-11ea-11da-999d38785348
 # ╟─682db9f8-e7b1-11ea-3949-6b683ca8b47b

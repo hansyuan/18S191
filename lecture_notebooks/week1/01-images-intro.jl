@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.11.12
+# v0.19.4
 
 using Markdown
 using InteractiveUtils
@@ -7,10 +7,29 @@ using InteractiveUtils
 # This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
 macro bind(def, element)
     quote
+        local iv = try Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value catch; b -> missing; end
         local el = $(esc(element))
-        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : missing
+        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : iv(el)
         el
     end
+end
+
+# ╔═╡ de373816-ec79-11ea-2772-ebdca52246ac
+begin
+	import Pkg
+	Pkg.activate(mktempdir())
+end
+
+# ╔═╡ 552129ae-ebca-11ea-1fa1-3f9fa00a2601
+begin
+	Pkg.add(["Images", "ImageIO", "ImageMagick"])
+	using Images
+end
+
+# ╔═╡ fbe11200-e938-11ea-12e9-6125c1b56b25
+begin
+	Pkg.add("PlutoUI")
+	using PlutoUI
 end
 
 # ╔═╡ 5e688928-e939-11ea-0e16-fbc80af390ab
@@ -68,7 +87,7 @@ md"## Tools
 md"""# Module 1: Images"""
 
 # ╔═╡ 37c1d012-ebc9-11ea-2dfe-8b86bb78f283
-4 + 4
+4 + 5
 
 # ╔═╡ a0a97214-e8d2-11ea-0f46-0bfaf016ab6d
 md"""## Data takes many forms
@@ -160,24 +179,6 @@ md"""## If in doubt: Ask Julia!
 
 - Let's use the `Images.jl` package to load an image and see what we get
 """
-
-# ╔═╡ de373816-ec79-11ea-2772-ebdca52246ac
-begin
-	import Pkg
-	Pkg.activate(mktempdir())
-end
-
-# ╔═╡ 552129ae-ebca-11ea-1fa1-3f9fa00a2601
-begin
-	Pkg.add(["Images", "ImageIO", "ImageMagick"])
-	using Images
-end
-
-# ╔═╡ fbe11200-e938-11ea-12e9-6125c1b56b25
-begin
-	Pkg.add("PlutoUI")
-	using PlutoUI
-end
 
 # ╔═╡ 54c1ba3c-e8d2-11ea-3564-bdaca8563738
 # defines a variable called `url`
@@ -306,8 +307,8 @@ md"##"
 
 # ╔═╡ 78eafe4e-e933-11ea-3539-c13feb894ef6
 [
- head                   reverse(head, dims=2)
- reverse(head, dims=1)  reverse(reverse(head, dims=1), dims=2)
+ head                   reverse(head, dims=2) 					head
+ reverse(head, dims=1)  reverse(reverse(head, dims=1), dims=2)	reverse(head, dims=1)
 ]
 
 # ╔═╡ bf3f9050-e933-11ea-0df7-e5dcff6bb3ee
@@ -340,8 +341,8 @@ md"##"
 red = RGB(1, 0, 0)
 
 # ╔═╡ 3e3f841a-e936-11ea-0a81-1b95fe0faa83
-for i in 1:100
-	for j in 1:300
+for i in 1:300
+	for j in 1:500
 		new_phil[i, j] = red
 	end
 end
@@ -383,16 +384,21 @@ md"## Modifying the whole image at once
 - We define a **function** that turns a colour into just its red component
 "
 
-# ╔═╡ 31f3605a-e938-11ea-3a6d-29a185bbee31
+# ╔═╡ 993257aa-87e1-46e9-8df2-bd18b9508c5d
 function redify(c)
 	return RGB(c.r, 0, 0)
+end
+
+# ╔═╡ 0b3962fb-c544-4d34-be7a-b066fe0a6d0c
+function greenify(c)
+	return RGB(0, c.g, 0)
 end
 
 # ╔═╡ 2744a556-e94f-11ea-2434-d53c24e59285
 begin
 	color = RGB(0.9, 0.7, 0.2)
 	
-	[color, redify(color)]
+	[color, redify(color), greenify(color)]
 end
 
 # ╔═╡ 98412a36-e93b-11ea-1954-f1c105c6ed4a
@@ -400,6 +406,9 @@ md"##"
 
 # ╔═╡ 3c32efde-e938-11ea-1ae4-5d88290f5311
 redify.(philip)
+
+# ╔═╡ e37f7a91-2a68-438f-aff8-fac0cb5dcd3b
+greenify.(philip)
 
 # ╔═╡ 4b26e4e6-e938-11ea-2635-6d4fc15e13b7
 md"## Transforming an image
@@ -783,10 +792,12 @@ grant = decimate(process_raw_camera_data(raw_camera_data), 2)
 # ╟─918a0762-e93b-11ea-1115-71dbfdb03f27
 # ╠═daabe66c-e937-11ea-3bc3-d77f2bce406c
 # ╟─095ced62-e938-11ea-1169-939dc7136fd0
-# ╠═31f3605a-e938-11ea-3a6d-29a185bbee31
+# ╠═993257aa-87e1-46e9-8df2-bd18b9508c5d
+# ╠═0b3962fb-c544-4d34-be7a-b066fe0a6d0c
 # ╠═2744a556-e94f-11ea-2434-d53c24e59285
 # ╟─98412a36-e93b-11ea-1954-f1c105c6ed4a
 # ╠═3c32efde-e938-11ea-1ae4-5d88290f5311
+# ╠═e37f7a91-2a68-438f-aff8-fac0cb5dcd3b
 # ╟─4b26e4e6-e938-11ea-2635-6d4fc15e13b7
 # ╠═41fa85c0-e939-11ea-1ad8-79805a2083bb
 # ╟─c12e0928-e93b-11ea-0922-2b590a99ee89

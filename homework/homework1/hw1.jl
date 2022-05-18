@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.11.13
+# v0.19.4
 
 using Markdown
 using InteractiveUtils
@@ -7,10 +7,29 @@ using InteractiveUtils
 # This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
 macro bind(def, element)
     quote
+        local iv = try Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value catch; b -> missing; end
         local el = $(esc(element))
-        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : missing
+        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : iv(el)
         el
     end
+end
+
+# ╔═╡ 65780f00-ed6b-11ea-1ecf-8b35523a7ac0
+begin
+	import Pkg
+	Pkg.activate(mktempdir())
+end
+
+# ╔═╡ 74b008f6-ed6b-11ea-291f-b3791d6d1b35
+begin
+	Pkg.add(["Images", "ImageMagick"])
+	using Images
+end
+
+# ╔═╡ 6b30dc38-ed6b-11ea-10f3-ab3f121bf4b8
+begin
+	Pkg.add("PlutoUI")
+	using PlutoUI
 end
 
 # ╔═╡ 83eb9ca0-ed68-11ea-0bc5-99a09c68f867
@@ -49,24 +68,6 @@ Submission by: **_$(student.name)_** ($(student.kerberos_id)@mit.edu)
 # ╔═╡ 5f95e01a-ee0a-11ea-030c-9dba276aba92
 md"_Let's create a package environment:_"
 
-# ╔═╡ 65780f00-ed6b-11ea-1ecf-8b35523a7ac0
-begin
-	import Pkg
-	Pkg.activate(mktempdir())
-end
-
-# ╔═╡ 74b008f6-ed6b-11ea-291f-b3791d6d1b35
-begin
-	Pkg.add(["Images", "ImageMagick"])
-	using Images
-end
-
-# ╔═╡ 6b30dc38-ed6b-11ea-10f3-ab3f121bf4b8
-begin
-	Pkg.add("PlutoUI")
-	using PlutoUI
-end
-
 # ╔═╡ 67461396-ee0a-11ea-3679-f31d46baa9b4
 md"_We set up Images.jl again:_"
 
@@ -87,15 +88,14 @@ md"#### Exerise 1.1
 "
 
 # ╔═╡ f51333a6-eded-11ea-34e6-bfbb3a69bcb0
-random_vect = missing # replace this with your code!
+random_vect = rand(10) # replace this with your code!
 
 # ╔═╡ cf738088-eded-11ea-2915-61735c2aa990
 md"👉 Make a function `mean` using a `for` loop, which computes the mean/average of a vector of numbers."
 
 # ╔═╡ 0ffa8354-edee-11ea-2883-9d5bfea4a236
 function mean(x)
-	
-	return missing
+	return sum(x)/length(x)
 end
 
 # ╔═╡ 1f104ce4-ee0e-11ea-2029-1d9c817175af
@@ -105,15 +105,15 @@ mean([1, 2, 3])
 md"👉 Define `m` to be the mean of `random_vect`."
 
 # ╔═╡ 2a391708-edee-11ea-124e-d14698171b68
-m = missing
+m = mean(random_vect)
 
 # ╔═╡ e2863d4c-edef-11ea-1d67-332ddca03cc4
 md"""👉 Write a function `demean`, which takes a vector `x` and subtracts the mean from each value in `x`."""
 
 # ╔═╡ ec5efe8c-edef-11ea-2c6f-afaaeb5bc50c
 function demean(x)
-	
-	return missing
+	m = mean(x)
+	return x .- m
 end
 
 # ╔═╡ 29e10640-edf0-11ea-0398-17dbf4242de3
@@ -144,8 +144,11 @@ md"""
 
 # ╔═╡ b6b65b94-edf0-11ea-3686-fbff0ff53d08
 function create_bar()
-	
-	return missing
+	zs = zeros(100)
+	for i in 50:69
+		zs[i] = 1
+	end 
+	return zs
 end
 
 # ╔═╡ 22f28dae-edf2-11ea-25b5-11c369ae1253
@@ -157,9 +160,19 @@ md"""
 
 # ╔═╡ 8c19fb72-ed6c-11ea-2728-3fa9219eddc4
 function vecvec_to_matrix(vecvec)
-	
-	return missing
+
+	matr = fill(0, length(vecvec), length(vecvec[1]))
+
+	for i in 1: length(vecvec)
+		for j in 1: length(vecvec[i])
+			matr[i, j] = vecvec[i][j]
+		end
+	end
+
+	# matr = [vec[i][j] for i in 1:length(vecvec) for j in 1:length(vecvec[i])]
+	return matr
 end
+
 
 # ╔═╡ c4761a7e-edf2-11ea-1e75-118e73dadbed
 vecvec_to_matrix([[1,2], [3,4]])
@@ -172,9 +185,25 @@ md"""
 """
 
 # ╔═╡ 9f1c6d04-ed6c-11ea-007b-75e7e780703d
+
 function matrix_to_vecvec(matrix)
+	(i, j) = size(matrix)
+
+	vecvec = Vector()
+
+	println(vecvec)
 	
-	return missing
+	for x in 1:i
+		vec = Vector()
+		
+		for y in 1:j
+			push!(vec, matrix[x,y])
+		end
+
+		push!(vecvec, vec)
+		println(vecvec)
+	end
+	return vecvec
 end
 
 # ╔═╡ 70955aca-ed6e-11ea-2330-89b4d20b1795
@@ -219,8 +248,13 @@ md"""
 
 # ╔═╡ f6898df6-ee07-11ea-2838-fde9bc739c11
 function mean_colors(image)
+	i, j = size(image)
 	
-	return missing
+	return (
+		mean([image[x, y].r for x in 1:i for y in 1:j]),
+		mean([image[x, y].g for x in 1:i for y in 1:j]),
+		mean([image[x, y].b for x in 1:i for y in 1:j])
+	)
 end
 
 # ╔═╡ d75ec078-ee0d-11ea-3723-71fb8eecb040
@@ -232,21 +266,40 @@ md"""
 👉 Look up the documentation on the `floor` function. Use it to write a function `quantize(x::Number)` that takes in a value $x$ (which you can assume is between 0 and 1) and "quantizes" it into bins of width 0.1. For example, check that 0.267 gets mapped to 0.2.
 """
 
+# ╔═╡ 5102cbfa-f2d3-472d-a998-5c8ce97709f3
+begin
+	floor(1.2)
+end
+
+# ╔═╡ 5cf8b89d-a7f1-43c1-9465-e36e86b53061
+begin
+	d = 0.34799
+	
+	function floor_dec(d::Number)
+		return floor(d * 10) / 10
+	end
+
+	floor_dec(d)
+end
+
 # ╔═╡ f6991a50-ee07-11ea-0bc4-1d68eb028e6a
 begin
 	function quantize(x::Number)
+		# Gives the floor of a decimal to the 0.1 digit 
 		
-		return missing
+		return floor_dec(x) 
 	end
 	
 	function quantize(color::AbstractRGB)
 		# you will write me in a later exercise!
-		return missing
+		# println(color.r)
+		return RGB(quantize(color.r), quantize(color.g), quantize(color.b))
 	end
 	
 	function quantize(image::AbstractMatrix)
 		# you will write me in a later exercise!
-		return missing
+		# return missing
+		return quantize.(image)
 	end
 end
 
@@ -264,6 +317,12 @@ Here, `::AbstractRGB` is a **type annotation**. This ensures that this version o
 
 The method you write should return a new `RGB` object, in which each component ($r$, $g$ and $b$) are quantized.
 """
+
+# ╔═╡ 2365cb78-5829-468b-a763-9e0fca1397e3
+begin
+	red3 = RGB(0.8, 0.1, 0.1)
+	quantize(red3)
+end
 
 # ╔═╡ f6bf64da-ee07-11ea-3efb-05af01b14f67
 md"""
@@ -285,7 +344,7 @@ md"""
 # ╔═╡ 63e8d636-ee0b-11ea-173d-bd3327347d55
 function invert(color::AbstractRGB)
 	
-	return missing
+	return RGB(1- color.r, 1-color.g, 1-color.b)
 end
 
 # ╔═╡ 2cc2f84e-ee0d-11ea-373b-e7ad3204bb00
@@ -306,30 +365,66 @@ invert(red)
 # ╔═╡ 846b1330-ee0b-11ea-3579-7d90fafd7290
 md"Can you invert the picture of Philip?"
 
-# ╔═╡ 943103e2-ee0b-11ea-33aa-75a8a1529931
-philip_inverted = missing
-
 # ╔═╡ f6d6c71a-ee07-11ea-2b63-d759af80707b
 md"""
 #### Exercise 2.6
 👉 Write a function `noisify(x::Number, s)` to add randomness of intensity $s$ to a value $x$, i.e. to add a random value between $-s$ and $+s$ to $x$. If the result falls outside the range $(0, 1)$ you should "clamp" it to that range. (Note that Julia has a `clamp` function, but you should write your own function `myclamp(x)`.)
 """
 
+# ╔═╡ 02ccd7c7-a913-477d-98d3-c83728a84893
+function rand_range()
+	return rand() * 2 - 1
+end
+
+# ╔═╡ 8329138d-1e21-46c4-892d-0c9e2f195b40
+for i in 1:4000
+	r = rand_range()
+	@assert r <= 1
+	@assert r >= -1
+end
+
+# ╔═╡ 915dcf48-02da-4b0c-9041-7a4a6c37ed7b
+function my_clamp(l::Number, h::Number, n::Number)
+	if n < l
+		return l
+		
+	elseif n > h
+		return h
+		
+	else 
+		return n
+	end 
+end
+
+
+# ╔═╡ ca8f6621-8d71-41fd-badb-556ace036eb7
+begin
+	@assert my_clamp(4, 5, 7) == 5
+	@assert my_clamp(4, 5, 3) == 4
+	@assert my_clamp(3, 4, 5) == 4
+	@assert my_clamp(3, 4, 4) == 4
+	@assert my_clamp(3, 4, 3) == 3
+end
+
 # ╔═╡ f6e2cb2a-ee07-11ea-06ee-1b77e34c1e91
 begin
 	function noisify(x::Number, s)
-
-		return missing
+		neg_s = 0 - s
+		r = rand_range()
+		return x + (r * s)
+		# return x + my_clamp(neg_s, s, r)
 	end
 	
 	function noisify(color::AbstractRGB, s)
 		# you will write me in a later exercise!
-		return missing
+		rgb = (color.r, color.g, color.b)
+		new_rgb = noisify.(rgb, s)
+		return RGB(new_rgb[1], new_rgb[2], new_rgb[3])
 	end
 	
 	function noisify(image::AbstractMatrix, s)
 		# you will write me in a later exercise!
-		return missing
+		return noisify.(image, s)
 	end
 end
 
@@ -372,7 +467,11 @@ You may need noise intensities larger than 1. Why?
 
 # ╔═╡ bdc2df7c-ee0c-11ea-2e9f-7d2c085617c1
 answer_about_noise_intensity = md"""
-The image is unrecognisable with intensity ...
+The image is unrecognisable with intensity ... like 4 or 5. 
+
+You need s to be sufficiently big, in order to get a wide enough variation of pixels to make the image seem random.
+
+**hello world!**
 """
 
 # ╔═╡ 81510a30-ee0e-11ea-0062-8b3327428f9d
@@ -384,7 +483,7 @@ decimate(image, ratio=5) = image[1:ratio:end, 1:ratio:end]
 # ╔═╡ c8ecfe5c-ee05-11ea-322b-4b2714898831
 philip = let
 	original = Images.load(philip_file)
-	decimate(original, 8)
+	decimate(original, 9)
 end
 
 # ╔═╡ 5be9b144-ee0d-11ea-2a8d-8775de265a1d
@@ -392,6 +491,9 @@ mean_colors(philip)
 
 # ╔═╡ 9751586e-ee0c-11ea-0cbb-b7eda92977c9
 quantize(philip)
+
+# ╔═╡ 943103e2-ee0b-11ea-33aa-75a8a1529931
+philip_inverted = invert.(philip)
 
 # ╔═╡ ac15e0d0-ee0c-11ea-1eaf-d7f88b5df1d7
 noisify(philip, philip_noise)
@@ -1402,10 +1504,13 @@ with_sobel_edge_detect(sobel_camera_image)
 # ╟─4d0158d0-ee0d-11ea-17c3-c169d4284acb
 # ╠═d75ec078-ee0d-11ea-3723-71fb8eecb040
 # ╟─f68d4a36-ee07-11ea-0832-0360530f102e
+# ╠═5102cbfa-f2d3-472d-a998-5c8ce97709f3
+# ╠═5cf8b89d-a7f1-43c1-9465-e36e86b53061
 # ╠═f6991a50-ee07-11ea-0bc4-1d68eb028e6a
 # ╠═f6a655f8-ee07-11ea-13b6-43ca404ddfc7
 # ╟─c905b73e-ee1a-11ea-2e36-23b8e73bfdb6
 # ╟─f6b218c0-ee07-11ea-2adb-1968c4fd473a
+# ╠═2365cb78-5829-468b-a763-9e0fca1397e3
 # ╟─f6bf64da-ee07-11ea-3efb-05af01b14f67
 # ╟─25dad7ce-ee0b-11ea-3e20-5f3019dd7fa3
 # ╠═9751586e-ee0c-11ea-0cbb-b7eda92977c9
@@ -1419,6 +1524,10 @@ with_sobel_edge_detect(sobel_camera_image)
 # ╟─846b1330-ee0b-11ea-3579-7d90fafd7290
 # ╠═943103e2-ee0b-11ea-33aa-75a8a1529931
 # ╟─f6d6c71a-ee07-11ea-2b63-d759af80707b
+# ╠═02ccd7c7-a913-477d-98d3-c83728a84893
+# ╠═8329138d-1e21-46c4-892d-0c9e2f195b40
+# ╠═915dcf48-02da-4b0c-9041-7a4a6c37ed7b
+# ╠═ca8f6621-8d71-41fd-badb-556ace036eb7
 # ╠═f6e2cb2a-ee07-11ea-06ee-1b77e34c1e91
 # ╟─f6ef2c2e-ee07-11ea-13a8-2512e7d94426
 # ╟─f6fc1312-ee07-11ea-39a0-299b67aee3d8
